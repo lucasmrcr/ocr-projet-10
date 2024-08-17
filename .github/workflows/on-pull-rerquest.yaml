@@ -22,7 +22,7 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Launch tests
-        run: cd ~/back && mvn clean test
+        run: cd back && pwd && mvn clean test
   test-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +35,6 @@ jobs:
         with:
           node-version: 20.16.0
       - name: install dependencies
-        run: cd ~/front && npm install
+        run: cd front && npm install
       - name: Launch tests
-        run: cd ~/front && npm run test
+        run: npm run test
