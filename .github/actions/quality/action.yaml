@@ -23,21 +23,16 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Prepare branch name
-      shell: bash
-      run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-      id: get-branch
-
     - name: SonarCloud Scan
       uses: sonarsource/sonarqube-scan-action@master
       env:
         SONAR_HOST_URL: ${{ inputs.sonar_host }}
         SONAR_TOKEN: ${{ inputs.sonar_token }}
       with:
-        projectBaseDir: back
+        projectBaseDir: ${{ inputs.project_base_dir }}
         args: >
           -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.qualitygate.wait=true
-          -Dsonar.branch.name=${{ steps.get-branch.outputs.branch }}
+          -Dsonar.branch.name=${{ github.head_ref || github.ref_name }}
           -Dsonar.projectKey=${{ inputs.sonar_project_key }}
           ${{ inputs.sonar_options }}
