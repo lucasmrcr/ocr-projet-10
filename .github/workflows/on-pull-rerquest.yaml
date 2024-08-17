@@ -1,0 +1,21 @@
+on:
+  pull_request: 
+    branches: 
+      - dev
+
+# cancel workflow when there is already one launched
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-java
+        with:
+          java-version: 11
