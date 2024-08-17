@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-      - name: SonarCloud Scan Backend
+      - name: SonarCloud Scan Frontend
         uses: sonarsource/sonarcloud-github-action@v2.3.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -83,5 +83,10 @@ jobs:
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_frontend
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.qualitygate.wait=true
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.exclusions=**/*.spec.ts,**/*test.ts,**/*.js
+            -Dsonar.test.inclusions=**/*.spec.ts,**/*test.ts
+            -Dsonar.coverage.exclusions=**/*.js,src/main.ts,src/polyfills.ts,**/*environment*.ts,**/*module.ts,**/app.config.ts,**/app.routes.ts
+            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info

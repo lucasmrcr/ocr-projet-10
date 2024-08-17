@@ -25,21 +25,16 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/bobapp'),
+      dir: require('path').join(__dirname, './coverage'),
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' },
-        { type: 'lcov', subdir: '.' } // added lcov reporter
+        { type: 'lcovonly'},
+        { type: 'text-summary' }
       ]
     },
-    reporters: ['coverage', 'progress', 'kjhtml'], // replaced 'lcov' with 'coverage'
-    port: 9876,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: true,
+    reporters: ['progress', 'kjhtml'],
     browsers: ['Chrome'],
-    singleRun: false,
     restartOnFileChange: true
   });
 };
