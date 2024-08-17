@@ -67,6 +67,7 @@ jobs:
             -Dsonar.java.binaries=target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
             -Dsonar.qualitygate.wait=true
+            -Dsonar.branch.name=${{ steps.get-branch.outputs.branch }}
             
   sonarcloud-frontend:
     runs-on: ubuntu-latest
@@ -90,3 +91,4 @@ jobs:
             -Dsonar.test.inclusions=**/*.spec.ts,**/*test.ts
             -Dsonar.coverage.exclusions=**/*.js,src/main.ts,src/polyfills.ts,**/*environment*.ts,**/*module.ts,**/app.config.ts,**/app.routes.ts
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+            -Dsonar.branch.name=${{ steps.get-branch.outputs.branch }}
