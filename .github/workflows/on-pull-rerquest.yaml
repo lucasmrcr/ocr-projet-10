@@ -21,8 +21,8 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Launch tests
-        shell: bash
-        run: cd back && pwd && mvn clean test
+        working-directory: back
+        run: mvn clean test
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -34,9 +34,11 @@ jobs:
         with:
           node-version: 20.16.0
       - name: install dependencies
-        run: cd front && npm install
+        working-directory: front
+        run: npm install
       - name: Launch tests
-        run: cd front && npm run test:prod
+        working-directory: front
+        run: npm run test:prod
 
   sonarcloud-backend:
     runs-on: ubuntu-latest
@@ -50,7 +52,8 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Compile project
-        run: cd back && pwd && mvn clean package
+        working-directory: back
+        run: mvn clean package
       - name: SonarCloud Scan Backend
         uses: sonarsource/sonarcloud-github-action@v2.3.0
         env:
@@ -62,6 +65,7 @@ jobs:
             -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_backend
             -Dsonar.sources=src/main/
             -Dsonar.java.binaries=target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
             -Dsonar.qualitygate.wait=true
             
   sonarcloud-frontend:
@@ -79,4 +83,5 @@ jobs:
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_frontend
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.qualitygate.wait=true
