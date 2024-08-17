@@ -59,7 +59,7 @@ jobs:
 
       - uses: ./.github/actions/quality
         with:
-          project: 'backend'
+          project_base_dir: 'back'
           organization: ${{ vars.SONAR_ORGANIZATION }}
           sonar_host: ${{ vars.SONAR_HOST }}
           sonar_token: ${{ secrets.SONAR_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
 
       - uses: ./.github/actions/quality
         with:
-          project: 'frontend'
+          project_base_dir: 'front'
           organization: ${{ vars.SONAR_ORGANIZATION }}
           sonar_host: ${{ vars.SONAR_HOST }}
           sonar_token: ${{ secrets.SONAR_TOKEN }}

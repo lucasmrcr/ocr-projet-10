@@ -1,7 +1,7 @@
 name: Check quality of branch
 
 inputs:
-  project:
+  project_base_dir:
     required: true
     description: Project to use on quality steps - frontend or backend
   organization:
