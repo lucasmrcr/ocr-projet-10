@@ -1,0 +1,82 @@
+on:
+  pull_request: 
+    branches: 
+      - dev
+      - main
+
+# cancel workflow when there is already one launched
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4  
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 11
+      - name: Launch tests
+        shell: bash
+        run: cd back && pwd && mvn clean test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4  
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.16.0
+      - name: install dependencies
+        run: cd front && npm install
+      - name: Launch tests
+        run: cd front && npm run test:prod
+
+  sonarcloud-backend:
+    runs-on: ubuntu-latest
+    needs: [ test-backend ]
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 11
+      - name: Compile project
+        run: cd back && pwd && mvn clean package
+      - name: SonarCloud Scan Backend
+        uses: sonarsource/sonarcloud-github-action@v2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: back
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_backend
+            -Dsonar.sources=src/main/
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.qualitygate.wait=true
+            
+  sonarcloud-frontend:
+    runs-on: ubuntu-latest
+    needs: [ test-frontend ]
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: SonarCloud Scan Backend
+        uses: sonarsource/sonarcloud-github-action@v2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: front
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_frontend
+            -Dsonar.qualitygate.wait=true
