@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-backend:
+  quality-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -20,11 +20,30 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 11
+      
+      # Tests
       - name: Launch tests
         working-directory: back
         run: mvn clean test
 
-  test-frontend:
+      # Quality
+      - name: Compile project
+        working-directory: back
+        run: mvn clean package
+
+      - uses: ./.github/actions/quality
+        with:
+          project_base_dir: 'back'
+          organization: ${{ vars.SONAR_ORGANIZATION }}
+          sonar_host: ${{ vars.SONAR_HOST }}
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          sonar_project_key: ${{ vars.SONAR_ORGANIZATION }}_backend
+          sonar_options: >
+            -Dsonar.sources=src/main/
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+  quality-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -36,6 +55,23 @@ jobs:
       - name: install dependencies
         working-directory: front
         run: npm install
+
+      # Tests
       - name: Launch tests
         working-directory: front
         run: npm run test:prod
+
+      # Quality
+      - uses: ./.github/actions/quality
+        with:
+          project_base_dir: 'front'
+          organization: ${{ vars.SONAR_ORGANIZATION }}
+          sonar_host: ${{ vars.SONAR_HOST }}
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          sonar_project_key: ${{ vars.SONAR_ORGANIZATION }}_frontend
+          sonar_options: >
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.exclusions=**/*.spec.ts,**/*test.ts,**/*.js
+            -Dsonar.test.inclusions=**/*.spec.ts,**/*test.ts
+            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
