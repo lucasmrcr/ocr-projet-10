@@ -1,0 +1,30 @@
+name: Build and push docker image
+
+inputs:
+  username:
+    required: true
+    description: Registry username to use
+  password:
+    required: true
+    description: Registry password to use
+  tags:
+    required: true
+    description: List of tags to use when pushing image  
+  context:
+    required: true
+    description: Docker context to use
+
+runs:
+  using: composite
+  steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        push: true
+        tags: ${{ inputs.tags }}
