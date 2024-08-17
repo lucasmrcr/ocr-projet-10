@@ -34,13 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.16.0
-      - name: Cache Node packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/front/node_modules
-          restore-keys: |
-            npm-${{ hashFiles('package-lock.json') }}
       - name: install dependencies
         run: cd ~/front && npm install
       - name: Launch tests
