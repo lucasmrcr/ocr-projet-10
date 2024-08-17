@@ -15,17 +15,28 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4  
-      - uses: ./.github/actions/launch-tests
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          project: backend
+          distribution: 'corretto'
+          java-version: 11
+      - name: Launch tests
+        shell: bash
+        run: cd back && pwd && mvn clean test
+
   test-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4  
-      - uses: ./.github/actions/launch-tests
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          project: frontend
+          node-version: 20.16.0
+      - name: install dependencies
+        run: cd front && npm install
+      - name: Launch tests
+        run: cd front && npm run test:prod
 
   sonarcloud-backend:
     runs-on: ubuntu-latest
@@ -52,6 +63,7 @@ jobs:
             -Dsonar.sources=src/main/
             -Dsonar.java.binaries=target/classes
             -Dsonar.qualitygate.wait=true
+            
   sonarcloud-frontend:
     runs-on: ubuntu-latest
     needs: [ test-frontend ]
@@ -68,37 +80,3 @@ jobs:
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_frontend
             -Dsonar.qualitygate.wait=true
-  deploy-backend:
-    runs-on: ubuntu-latest
-    needs: [ test-backend ]
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: back
-          push: true
-          tags: ${{ vars.DOCKERHUB_BACKEND_REPO }}:latest
-  deploy-frontend:
-    runs-on: ubuntu-latest
-    needs: [ test-frontend ]
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: front
-          push: true
-          tags: ${{ vars.DOCKERHUB_FRONTEND_REPO }}:latest
