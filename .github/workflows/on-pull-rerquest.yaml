@@ -22,4 +22,26 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Launch tests
-        run: cd back && mvn clean test
+        run: cd ~/back && mvn clean test
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts
+      - name: Cache Node packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/front/node_modules
+          restore-keys: |
+            npm-${{ hashFiles('package-lock.json') }}
+      - name: install dependencies
+        run: cd ~/front && npm install
+      - name: Launch tests
+        run: cd ~/front && mvn clean test
