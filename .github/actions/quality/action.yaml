@@ -1,0 +1,38 @@
+name: Check quality of branch
+
+inputs:
+  project_base_dir:
+    required: true
+    description: Project to use on quality steps - frontend or backend
+  organization:
+    required: true
+    description: Organization name to use
+  sonar_host:
+    required: true
+    description: Sonar host to use
+  sonar_token:
+    required: true
+    description: Sonar token to use
+  sonar_project_key:
+    required: true
+    description: Sonar projet key to use
+  sonar_options:
+    required: false
+    description: more args to sonar scanner
+    
+runs:
+  using: composite
+  steps:
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_HOST_URL: ${{ inputs.sonar_host }}
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
+      with:
+        projectBaseDir: ${{ inputs.project_base_dir }}
+        args: >
+          -Dsonar.organization=${{ inputs.organization }}
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.branch.name=${{ github.head_ref || github.ref_name }}
+          -Dsonar.projectKey=${{ inputs.sonar_project_key }}
+          ${{ inputs.sonar_options }}
