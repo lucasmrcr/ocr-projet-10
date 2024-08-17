@@ -46,6 +46,17 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+  
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 11
+
+      - name: Compile project
+        working-directory: back
+        run: mvn clean package
+
       - uses: ./.github/actions/quality
         with:
           project: 'backend'

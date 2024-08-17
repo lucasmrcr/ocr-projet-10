@@ -28,18 +28,6 @@ runs:
       run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
       id: get-branch
 
-    - name: Setup Java
-      if: ${{ inputs.project }} == 'backend'
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'corretto'
-        java-version: 11
-    - name: Compile project
-      if: ${{ inputs.project }} == 'backend'
-      working-directory: back
-      run: mvn clean package
-
-
     - name: SonarCloud Scan
       uses: sonarsource/sonarqube-scan-action@master
       env:
