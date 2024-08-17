@@ -9,13 +9,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  test-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-      - uses: ./.github/actions/setup-java
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
+          distribution: 'corretto'
           java-version: 11
+      - name: Launch tests
+        run: cd back && mvn clean test
