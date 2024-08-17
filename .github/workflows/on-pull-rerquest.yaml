@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -29,8 +27,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -39,3 +35,26 @@ jobs:
         run: cd front && npm install
       - name: Launch tests
         run: cd front && npm run test:prod
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: SonarCloud Scan Backend
+        uses: sonarsource/sonarcloud-github-action@2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: back
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=backend      
+      - name: SonarCloud Scan Frontend
+        uses: sonarsource/sonarcloud-github-action@2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: front
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=frontend
