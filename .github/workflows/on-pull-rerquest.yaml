@@ -2,6 +2,7 @@ on:
   pull_request: 
     branches: 
       - dev
+      - main
 
 # cancel workflow when there is already one launched
 concurrency:
