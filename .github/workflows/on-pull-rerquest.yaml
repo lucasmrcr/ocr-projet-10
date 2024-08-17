@@ -56,7 +56,7 @@ jobs:
           projectBaseDir: back
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.projectKey=backend
+            -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_backend
             -Dsonar.sources=src/main/
             -Dsonar.java.binaries=target/classes
   sonarcloud-frontend:
@@ -73,4 +73,4 @@ jobs:
           projectBaseDir: front
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.projectKey=frontend
+            -Dsonar.projectKey=${{ vars.SONAR_ORGANIZATION }}_frontend
