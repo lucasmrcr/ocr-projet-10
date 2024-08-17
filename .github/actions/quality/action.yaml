@@ -1,0 +1,55 @@
+name: Check quality of branch
+
+inputs:
+  project:
+    required: true
+    description: Project to use on quality steps - frontend or backend
+  organization:
+    required: true
+    description: Organization name to use
+  sonar_host:
+    required: true
+    description: Sonar host to use
+  sonar_token:
+    required: true
+    description: Sonar token to use
+  sonar_project_key:
+    required: true
+    description: Sonar projet key to use
+  sonar_options:
+    required: false
+    description: more args to sonar scanner
+    
+runs:
+  using: composite
+  steps:
+    - name: Prepare branch name
+      shell: bash
+      run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+      id: get-branch
+
+    - name: Setup Java
+      if: ${{ inputs.project }} == 'backend'
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: 11
+    - name: Compile project
+      if: ${{ inputs.project }} == 'backend'
+      working-directory: back
+      run: mvn clean package
+
+
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_HOST_URL: ${{ inputs.sonar_host }}
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
+      with:
+        projectBaseDir: back
+        args: >
+          -Dsonar.organization=${{ inputs.organization }}
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.branch.name=${{ steps.get-branch.outputs.branch }}
+          -Dsonar.projectKey=${{ inputs.sonar_project_key }}
+          ${{ inputs.sonar_options }}
