@@ -25,6 +25,7 @@ runs:
         distribution: 'corretto'
         java-version: ${{ inputs.java-version }}
     - name: Launch tests
+      shell: bash
       if: ${{ inputs.project }} == 'backend'
       run: cd back && pwd && mvn clean test
 
@@ -34,6 +35,8 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
     - name: install dependencies
+      shell: bas
       run: cd front && npm install
     - name: Launch tests
+      shell: bas
       run: cd front && npm run test:prod
